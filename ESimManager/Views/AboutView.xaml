@@ -1,0 +1,41 @@
+<UserControl x:Class="ESimManager.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{StaticResource PrimaryBackground}">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="eSIM Manager" 
+                      FontSize="32" FontWeight="Bold"
+                      Foreground="{StaticResource PrimaryText}"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,10"/>
+            
+            <TextBlock Text="Version 1.0.0" 
+                      FontSize="16"
+                      Foreground="{StaticResource SecondaryText}"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,30"/>
+            
+            <TextBlock Text="NexoraSIM Enterprise eSIM Management Solution" 
+                      FontSize="14"
+                      Foreground="{StaticResource SecondaryText}"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,10"/>
+            
+            <TextBlock Text="Built with .NET 8 WPF" 
+                      FontSize="12"
+                      Foreground="{StaticResource SecondaryText}"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,30"/>
+            
+            <TextBlock Text="© 2024 NexoraSIM. All rights reserved." 
+                      FontSize="12"
+                      Foreground="{StaticResource SecondaryText}"
+                      HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

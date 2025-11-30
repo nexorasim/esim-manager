@@ -1,0 +1,67 @@
+<UserControl x:Class="ESimManager.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{StaticResource PrimaryBackground}">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="Welcome to eSIM Manager" 
+                      FontSize="32" 
+                      FontWeight="Bold"
+                      Foreground="{StaticResource PrimaryText}"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,20"/>
+            
+            <TextBlock Text="NexoraSIM Enterprise eSIM Management" 
+                      FontSize="18"
+                      Foreground="{StaticResource SecondaryText}"
+                      HorizontalAlignment="Center"
+                      Margin="0,0,0,40"/>
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Border Background="{StaticResource SecondaryBackground}" 
+                       Padding="30,20" Margin="10" CornerRadius="8"
+                       BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Quick Actions" 
+                                  FontSize="16" FontWeight="Bold"
+                                  Foreground="{StaticResource PrimaryText}"
+                                  Margin="0,0,0,15"/>
+                        <Button Content="Connect Device" 
+                               Style="{StaticResource ModernButton}"
+                               Margin="0,5"/>
+                        <Button Content="Manage Profiles" 
+                               Style="{StaticResource ModernButton}"
+                               Margin="0,5"/>
+                        <Button Content="View Logs" 
+                               Style="{StaticResource ModernButton}"
+                               Margin="0,5"/>
+                    </StackPanel>
+                </Border>
+                
+                <Border Background="{StaticResource SecondaryBackground}" 
+                       Padding="30,20" Margin="10" CornerRadius="8"
+                       BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
+                    <StackPanel Width="200">
+                        <TextBlock Text="System Status" 
+                                  FontSize="16" FontWeight="Bold"
+                                  Foreground="{StaticResource PrimaryText}"
+                                  Margin="0,0,0,15"/>
+                        <TextBlock Text="Connection: Not Connected" 
+                                  Foreground="{StaticResource SecondaryText}"
+                                  Margin="0,5"/>
+                        <TextBlock Text="Active Profiles: 0" 
+                                  Foreground="{StaticResource SecondaryText}"
+                                  Margin="0,5"/>
+                        <TextBlock Text="Status: Ready" 
+                                  Foreground="{StaticResource SecondaryText}"
+                                  Margin="0,5"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

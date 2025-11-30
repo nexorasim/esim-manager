@@ -1,0 +1,109 @@
+<UserControl x:Class="ESimManager.Views.ESimProfilesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{StaticResource PrimaryBackground}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="eSIM Profiles" 
+                  FontSize="24" FontWeight="Bold"
+                  Foreground="{StaticResource PrimaryText}"
+                  Margin="0,0,0,20"/>
+
+        <!-- Provision New Profile -->
+        <Border Grid.Row="1" 
+               Background="{StaticResource SecondaryBackground}"
+               BorderBrush="{StaticResource BorderColor}"
+               BorderThickness="1"
+               CornerRadius="4"
+               Padding="15"
+               Margin="0,0,0,20">
+            <StackPanel>
+                <TextBlock Text="Provision New Profile" 
+                          Foreground="{StaticResource PrimaryText}"
+                          FontSize="16" FontWeight="Bold"
+                          Margin="0,0,0,10"/>
+                
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Text="{Binding ActivationCode, UpdateSourceTrigger=PropertyChanged}"
+                            Style="{StaticResource ModernTextBox}"
+                            Width="400"
+                            Margin="0,0,10,0"/>
+                    <Button Content="Provision" 
+                           Style="{StaticResource ModernButton}"
+                           Command="{Binding ProvisionProfileCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Profile List -->
+        <Border Grid.Row="2" 
+               Background="{StaticResource SecondaryBackground}"
+               BorderBrush="{StaticResource BorderColor}"
+               BorderThickness="1"
+               CornerRadius="4"
+               Padding="15">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBlock Text="Installed Profiles" 
+                              Foreground="{StaticResource PrimaryText}"
+                              FontSize="16" FontWeight="Bold"/>
+                    <Button Content="Refresh" 
+                           Style="{StaticResource ModernButton}"
+                           Command="{Binding LoadProfilesCommand}"
+                           Margin="15,0,0,0"
+                           Padding="10,5"/>
+                </StackPanel>
+
+                <DataGrid Grid.Row="1"
+                         ItemsSource="{Binding Profiles}"
+                         SelectedItem="{Binding SelectedProfile}"
+                         AutoGenerateColumns="False"
+                         Background="{StaticResource TertiaryBackground}"
+                         Foreground="{StaticResource PrimaryText}"
+                         BorderThickness="0"
+                         GridLinesVisibility="None"
+                         HeadersVisibility="Column">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ICCID" Binding="{Binding Iccid}" Width="*"/>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="Provider" Binding="{Binding Provider}" Width="*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+
+        <!-- Profile Actions -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,20,0,0">
+            <Button Content="Activate" 
+                   Style="{StaticResource ModernButton}"
+                   Command="{Binding ActivateProfileCommand}"
+                   Margin="0,0,10,0"/>
+            <Button Content="Deactivate" 
+                   Style="{StaticResource ModernButton}"
+                   Command="{Binding DeactivateProfileCommand}"
+                   Background="#FFC107"
+                   Margin="0,0,10,0"/>
+            <Button Content="Remove" 
+                   Style="{StaticResource ModernButton}"
+                   Command="{Binding RemoveProfileCommand}"
+                   Background="#DC3545"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,79 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore esim-manager.sln
+      
+    - name: Build
+      run: dotnet build esim-manager.sln --configuration Release --no-restore
+      
+    - name: Test
+      run: dotnet test esim-manager.sln --configuration Release --no-build --verbosity normal
+      
+    - name: Publish
+      run: |
+        dotnet publish ESimManager/ESimManager.csproj `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained false `
+          --output ./publish
+          
+    - name: Create installer package
+      run: |
+        Compress-Archive -Path ./publish/* -DestinationPath ./ESimManager-win-x64.zip
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: esim-manager-build
+        path: ./publish
+        
+    - name: Upload installer package
+      uses: actions/upload-artifact@v4
+      with:
+        name: esim-manager-installer
+        path: ./ESimManager-win-x64.zip
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: esim-manager-installer
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ESimManager-win-x64.zip
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

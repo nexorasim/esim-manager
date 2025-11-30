@@ -1,0 +1,1 @@
+esim-manager is a production-ready Windows Desktop Application for NexoraSIM that provides enterprise eSIM lifecycle management capabilities. The application supports both WLAN and Bluetooth connectivity for managing eSIM profiles on devices. It includes CI/CD automation and GitHub Pages documentation for streamlined development and deployment workflows.

@@ -5,61 +5,153 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ESimManager"
         mc:Ignorable="d"
-        Title="eSIM Manager - NexoraSIM" 
-        Height="700" Width="1200"
+        Title="NexoraSIM eSIM Manager 2026" 
+        Height="800" Width="1400"
         Background="{StaticResource PrimaryBackground}"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        MinHeight="600" MinWidth="1000">
     
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="240"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <!-- Top Header Bar -->
+        <Border Grid.Row="0" Grid.ColumnSpan="2" 
+                Background="{StaticResource PrimaryBackground}" 
+                BorderBrush="{StaticResource BorderColor}" 
+                BorderThickness="0,0,0,1"
+                Padding="20,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Logo and Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Border Background="{StaticResource AccentColor}" 
+                            Width="40" Height="40" 
+                            CornerRadius="8" 
+                            Margin="0,0,12,0">
+                        <TextBlock Text="N" 
+                                  FontSize="24" 
+                                  FontWeight="Bold" 
+                                  Foreground="#FFFFFF"
+                                  HorizontalAlignment="Center" 
+                                  VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="NexoraSIM" 
+                                  FontSize="18" 
+                                  FontWeight="Bold" 
+                                  Foreground="{StaticResource PrimaryText}"/>
+                        <TextBlock Text="eSIM Manager 2026" 
+                                  FontSize="11" 
+                                  Foreground="{StaticResource SecondaryText}"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <!-- User Info -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="{StaticResource SecondaryBackground}" 
+                            Padding="12,6" 
+                            CornerRadius="6" 
+                            Margin="0,0,8,0">
+                        <TextBlock Text="Administrator" 
+                                  FontSize="13" 
+                                  Foreground="{StaticResource PrimaryText}"/>
+                    </Border>
+                    <Border Background="{StaticResource SuccessColor}" 
+                            Width="10" Height="10" 
+                            CornerRadius="5" 
+                            VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- Navigation Sidebar -->
-        <Border Grid.Column="0" Background="{StaticResource SecondaryBackground}" 
-                BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,1,0">
+        <Border Grid.Row="1" Grid.Column="0" 
+                Background="{StaticResource SecondaryBackground}" 
+                BorderBrush="{StaticResource BorderColor}" 
+                BorderThickness="0,0,1,0"
+                Padding="12">
             <StackPanel>
-                <TextBlock Text="eSIM Manager" 
-                          FontSize="18" 
-                          FontWeight="Bold" 
-                          Foreground="{StaticResource PrimaryText}"
-                          Margin="16,20,16,30"/>
+                <TextBlock Text="NAVIGATION" 
+                          FontSize="11" 
+                          FontWeight="SemiBold" 
+                          Foreground="{StaticResource SecondaryText}"
+                          Margin="12,8,12,12"/>
                 
                 <Button Content="Dashboard" Style="{StaticResource NavButton}" 
-                        Click="NavigateToDashboard"/>
+                        Click="NavigateToDashboard" Margin="0,2"/>
                 <Button Content="Device Connection" Style="{StaticResource NavButton}" 
-                        Click="NavigateToDeviceConnection"/>
+                        Click="NavigateToDeviceConnection" Margin="0,2"/>
                 <Button Content="eSIM Profiles" Style="{StaticResource NavButton}" 
-                        Click="NavigateToESimProfiles"/>
+                        Click="NavigateToESimProfiles" Margin="0,2"/>
                 <Button Content="Logs" Style="{StaticResource NavButton}" 
-                        Click="NavigateToLogs"/>
+                        Click="NavigateToLogs" Margin="0,2"/>
+                
+                <Separator Margin="12,16" Background="{StaticResource BorderColor}"/>
+                
+                <TextBlock Text="SYSTEM" 
+                          FontSize="11" 
+                          FontWeight="SemiBold" 
+                          Foreground="{StaticResource SecondaryText}"
+                          Margin="12,8,12,12"/>
+                
                 <Button Content="Settings" Style="{StaticResource NavButton}" 
-                        Click="NavigateToSettings"/>
+                        Click="NavigateToSettings" Margin="0,2"/>
                 <Button Content="About" Style="{StaticResource NavButton}" 
-                        Click="NavigateToAbout"/>
+                        Click="NavigateToAbout" Margin="0,2"/>
             </StackPanel>
         </Border>
 
         <!-- Main Content Area -->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <Border Grid.Row="1" Grid.Column="1" 
+                Background="{StaticResource PrimaryBackground}"
+                Padding="24">
+            <ContentControl x:Name="ContentArea"/>
+        </Border>
 
-            <!-- Content Frame -->
-            <ContentControl x:Name="ContentArea" Grid.Row="0" Margin="20"/>
-
-            <!-- Status Bar -->
-            <Border Grid.Row="1" Background="{StaticResource SecondaryBackground}" 
-                    BorderBrush="{StaticResource BorderColor}" BorderThickness="0,1,0,0"
-                    Padding="16,8">
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Grid.ColumnSpan="2" 
+                Background="{StaticResource SecondaryBackground}" 
+                BorderBrush="{StaticResource BorderColor}" 
+                BorderThickness="0,1,0,0"
+                Padding="20,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
                 <TextBlock x:Name="StatusText" 
-                          Text="Ready" 
+                          Text="Ready • All systems operational" 
                           Foreground="{StaticResource SecondaryText}"
-                          FontSize="12"/>
-            </Border>
-        </Grid>
+                          FontSize="12"
+                          VerticalAlignment="Center"/>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="Version 1.0.0" 
+                              Foreground="{StaticResource SecondaryText}"
+                              FontSize="11"
+                              Margin="0,0,16,0"
+                              VerticalAlignment="Center"/>
+                    <TextBlock Text="© 2026 NexoraSIM" 
+                              Foreground="{StaticResource SecondaryText}"
+                              FontSize="11"
+                              VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

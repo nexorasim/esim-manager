@@ -75,7 +75,7 @@ public class DeviceConnectionService : IDeviceConnectionService
                     {
                         devices.Add(new DeviceInfo
                         {
-                            Id = Guid.NewGuid().ToString(),
+                            DeviceId = Guid.NewGuid().ToString(),
                             Name = ssid,
                             ConnectionType = ConnectionType.WLAN,
                             IsConnected = false

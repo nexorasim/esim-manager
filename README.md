@@ -1,190 +1,192 @@
-# eSIM Manager
+# NexoraSIM eSIM Management Suite
 
-Production-ready Windows Desktop Application for NexoraSIM, built with .NET 8 WPF, supporting WLAN & Bluetooth connectivity, enterprise eSIM lifecycle management, CI/CD automation, and GitHub Pages documentation.
+Production-ready multi-tier enterprise eSIM management platform with Windows Desktop Application (.NET 8 WPF), Backend API (Node.js/TypeScript), and Web Dashboard (Next.js/React).
 
 ![Build Status](https://github.com/nexorasim/esim-manager/workflows/Build%20and%20Release/badge.svg)
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
-![Platform](https://img.shields.io/badge/platform-Windows-0078D6)
+![Node.js](https://img.shields.io/badge/Node.js-20.x-339933)
+![Next.js](https://img.shields.io/badge/Next.js-14-000000)
+
+## Overview
+
+NexoraSIM is a unified platform for GSMA SGP.22 compliant eSIM profile management across Desktop, Web, and API interfaces. It provides enterprise-grade security with role-based access control, comprehensive audit logging, and encrypted data storage.
 
 ## Features
 
-- **Device Discovery**: Automatic discovery of eSIM-capable devices via WLAN and Bluetooth
-- **Connection Management**: Seamless device pairing and connection handling
-- **eSIM Profile Management**: 
-  - List installed profiles with GSMA SGP.22 compliance
-  - Provision new profiles with activation codes
-  - Activate/deactivate profiles with state validation
-  - Remove profiles with confirmation
-  - Export/import profile metadata
-- **Enterprise Security**: 
-  - Role-based access control (RBAC)
-  - Encrypted data storage (DPAPI)
-  - Comprehensive audit logging
-  - Session management
-- **System Logging**: Structured logging with Serilog
-- **Offline Support**: Operation queueing for offline scenarios
-- **Modern UI**: Professional light theme with clean navigation
-- **Property-Based Testing**: Comprehensive test coverage with FsCheck
+### Desktop Application (Windows)
+- Device discovery via WLAN and Bluetooth
+- Direct eSIM profile management (provision, activate, remove)
+- Offline operation queueing
+- DPAPI encrypted storage
+- Serilog structured logging
+
+### Web Dashboard
+- Modern dark-themed enterprise UI
+- Real-time profile and device management
+- QR code generation for mobile activation
+- Profile templates
+- Comprehensive audit logging
+- User management with RBAC
+
+### Backend API
+- RESTful API with JWT authentication
+- Role-based access control (Admin, Operator, Viewer)
+- MongoDB persistence with in-memory fallback
+- Rate limiting and security headers
+- Comprehensive audit trail
 
 ## Quick Start
 
-### Installation
-
-1. Download the latest release from [Releases](https://github.com/nexorasim/esim-manager/releases)
-2. Extract `ESimManager-win-x64.zip`
-3. Run `ESimManager.exe`
-
-### Build from Source
-
+### Desktop Application
 ```powershell
-# Clone the repository
+# Download from releases
+# Extract ESimManager-win-x64.zip
+# Run ESimManager.exe
+```
+
+### Web Dashboard
+```bash
+# Clone repository
 git clone https://github.com/nexorasim/esim-manager.git
 cd esim-manager
 
-# Restore and build
-dotnet restore
-dotnet build --configuration Release
+# Start API
+cd api
+npm install
+npm run dev
 
-# Run tests
-dotnet test
+# Start Web (new terminal)
+cd web
+npm install
+npm run dev
 
-# Publish
-dotnet publish ESimManager/ESimManager.csproj --configuration Release --runtime win-x64 --output ./publish
-
-# Run
-.\publish\ESimManager.exe
+# Open http://localhost:3000
 ```
 
 ## System Requirements
 
+### Desktop Application
 - Windows 10 Pro (1809+) or Windows 11 Pro
 - .NET 8 Runtime
-- WLAN adapter (for WLAN connectivity)
-- Bluetooth 4.0+ (for Bluetooth connectivity)
+- WLAN adapter or Bluetooth 4.0+
+
+### Web/API
+- Node.js 20.x
+- MongoDB 6.0+ (optional, uses in-memory storage as fallback)
+
+## Architecture
+
+```
+esim-manager/
+├── ESimManager/           # .NET 8 WPF Desktop Application
+│   ├── Models/            # Domain models
+│   ├── ViewModels/        # MVVM view models
+│   ├── Views/             # XAML views
+│   └── Services/          # Business logic
+├── api/                   # Node.js/TypeScript Backend API
+│   └── src/
+│       ├── routes/        # API endpoints
+│       ├── services/      # Business logic
+│       ├── models/        # MongoDB schemas
+│       └── middleware/    # Auth, validation, error handling
+├── web/                   # Next.js/React Web Dashboard
+│   └── src/
+│       ├── pages/         # Route pages
+│       ├── components/    # React components
+│       ├── services/      # API clients
+│       └── contexts/      # React contexts
+├── docs/                  # Documentation
+└── .github/workflows/     # CI/CD pipelines
+```
+
+## Technology Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| Desktop | .NET 8 WPF + SQLite | Local device management |
+| API | Node.js + Express + TypeScript | RESTful backend |
+| Web | Next.js 14 + React + TailwindCSS | Enterprise dashboard |
+| Database | MongoDB / SQLite | Data persistence |
+| Auth | JWT + bcrypt | Secure authentication |
+| Testing | xUnit + FsCheck | Property-based testing |
+| CI/CD | GitHub Actions | Automated builds |
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user
+
+### Profiles
+- `GET /api/profiles` - List user profiles
+- `POST /api/profiles/provision` - Provision new profile
+- `POST /api/profiles/:iccid/activate` - Activate profile
+- `POST /api/profiles/:iccid/deactivate` - Deactivate profile
+- `DELETE /api/profiles/:iccid` - Remove profile
+
+### Devices
+- `GET /api/devices` - List user devices
+- `POST /api/devices` - Add new device
+- `POST /api/devices/:eid/status` - Update device status
+- `DELETE /api/devices/:eid` - Remove device
+
+### Admin (Admin role required)
+- `GET /api/users` - List all users
+- `POST /api/users` - Create user
+- `PUT /api/users/:id` - Update user
+- `DELETE /api/users/:id` - Delete user
+- `GET /api/audit` - Get audit logs
+
+## Role-Based Access Control
+
+| Role | Permissions |
+|------|-------------|
+| Administrator | Full system access, user management, audit logs |
+| Operator | Profile and device management, templates |
+| Viewer | Read-only access to profiles and devices |
+
+## Deployment
+
+### Firebase Hosting
+```bash
+# Install Firebase CLI
+npm install -g firebase-tools
+
+# Login and deploy
+firebase login
+firebase deploy
+```
+
+### Environment Variables
+
+**API (.env)**
+```
+PORT=3001
+JWT_SECRET=your-secret-key
+MONGO_URL=mongodb://localhost:27017
+DB_NAME=nexorasim
+```
+
+**Web (.env.local)**
+```
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
 
 ## Documentation
-
-Full documentation is available at [https://nexorasim.github.io/esim-manager](https://nexorasim.github.io/esim-manager)
 
 - [Installation Guide](docs/installation.md)
 - [System Requirements](docs/system-requirements.md)
 - [Quick Start Guide](docs/quick-start.md)
-- [Troubleshooting](docs/troubleshooting.md)
 - [Developer Guide](docs/developer-guide.md)
+- [Troubleshooting](docs/troubleshooting.md)
 
-## Architecture
+## Live Demo
 
-Built with modern .NET 8 WPF using:
-
-- **MVVM Pattern**: Clean separation of concerns
-- **Dependency Injection**: Microsoft.Extensions.DependencyInjection
-- **MVVM Toolkit**: CommunityToolkit.Mvvm for reactive ViewModels
-- **Database**: Entity Framework Core 8.0 + SQLite
-- **Logging**: Serilog for structured logging
-- **Testing**: xUnit + FsCheck (property-based testing)
-- **Connectivity**: Native Windows APIs for WLAN and Bluetooth
-
-### Technology Stack
-
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Framework | .NET | 8.0 |
-| UI | WPF | - |
-| Database | SQLite + EF Core | 8.0.0 |
-| Testing | xUnit + FsCheck | 2.5.3 / 2.16.6 |
-| Logging | Serilog | 8.0.0 |
-| MVVM | CommunityToolkit.Mvvm | 8.2.2 |
-
-## Project Structure
-
-```
-esim-manager/
-├── ESimManager/              # Main WPF application
-│   ├── Data/                # EF Core DbContext
-│   ├── Models/              # Domain models and entities
-│   ├── ViewModels/          # MVVM view models
-│   ├── Views/               # XAML views
-│   ├── Services/            # Business logic services
-│   ├── Resources/           # Styles and themes
-│   └── Converters/          # Value converters
-├── ESimManager.Tests/       # Test project
-│   ├── PropertyTests/       # Property-based tests
-│   └── Services/            # Unit tests
-├── api/                     # Backend API (Node.js)
-├── web/                     # Web interface (Next.js)
-├── docs/                    # Documentation
-├── scripts/                 # Build automation
-└── .github/workflows/       # CI/CD pipelines
-```
-
-## CI/CD
-
-Automated workflows using GitHub Actions:
-
-- **Build and Release**: Multi-component build pipeline
-  - Desktop Application (Windows)
-  - API (Node.js/TypeScript)
-  - Web Application (Next.js/React)
-- **Testing**: Automated test execution on every push
-- **Release**: Creates installer package on version tags (v*)
-- **Documentation**: Auto-deploys to GitHub Pages on docs changes
-
-### Build Status
-
-| Component | Status |
-|-----------|--------|
-| Desktop App | 0 errors, 0 warnings, 9/9 tests passing |
-| API | Configured |
-| Web | Configured |
-| Documentation | Deployed to GitHub Pages |
-
-## Development
-
-### Prerequisites
-
-- Visual Studio 2022 (recommended) or VS Code
-- .NET 8 SDK
-- Windows 10/11 Pro
-- Node.js 20.x (for API/Web development)
-
-### Building
-
-```powershell
-# Desktop Application
-dotnet build
-
-# API
-npm install --prefix api
-npm run build --prefix api
-
-# Web
-npm install --prefix web
-npm run build --prefix web
-```
-
-### Testing
-
-```powershell
-# Desktop Application
-dotnet test
-
-# Run with coverage
-dotnet test --collect:"XPlat Code Coverage"
-```
-
-### Running
-
-```powershell
-# Desktop Application
-dotnet run --project ESimManager/ESimManager.csproj
-
-# API
-npm start --prefix api
-
-# Web
-npm run dev --prefix web
-```
+- **Web Dashboard**: [nexora-sim.web.app](https://nexora-sim.web.app)
+- **Documentation**: [nexorasim.github.io/esim-manager](https://nexorasim.github.io/esim-manager)
 
 ## Contributing
 
@@ -199,15 +201,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 - [Documentation](https://nexorasim.github.io/esim-manager)
 - [Issue Tracker](https://github.com/nexorasim/esim-manager/issues)
 - [Discussions](https://github.com/nexorasim/esim-manager/discussions)
-
-## Roadmap
-
-- [ ] Signed Windows installer (.exe)
-- [ ] Multi-device support
-- [ ] Profile templates
-- [ ] Advanced diagnostics
-- [ ] Remote management API
-- [ ] MDM/EMM/UEM integration
 
 ---
 

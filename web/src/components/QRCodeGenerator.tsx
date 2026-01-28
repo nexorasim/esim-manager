@@ -18,14 +18,19 @@ export function QRCodeGenerator({ value, size = 200, className = '' }: QRCodeGen
         color: {
           dark: '#000000',
           light: '#FFFFFF'
-        }
+        },
+        errorCorrectionLevel: 'M'
       }).catch(console.error)
     }
   }, [value, size])
 
   return (
-    <div className={`flex justify-center ${className}`}>
-      <canvas ref={canvasRef} className="border border-gray-200 rounded-lg" />
+    <div className={`flex justify-center ${className}`} data-testid="qr-code-container">
+      <canvas 
+        ref={canvasRef} 
+        className="rounded-lg"
+        data-testid="qr-code-canvas"
+      />
     </div>
   )
 }

@@ -6,22 +6,31 @@ on:
     paths:
       - 'docs/**'
       - '.github/workflows/docs.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   deploy:
+    name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       
     - name: Setup Pages
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
       
     - name: Create index.html
       run: |
@@ -32,59 +41,133 @@ jobs:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>eSIM Manager Documentation</title>
+            <title>NexoraSIM eSIM Manager Documentation</title>
             <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
                     line-height: 1.6;
+                    background: #FFFFFF;
+                    color: #212529;
+                }
+                .header {
+                    background: #2e70e5;
+                    color: white;
+                    padding: 2rem;
+                    text-align: center;
+                }
+                .container {
                     max-width: 1200px;
                     margin: 0 auto;
-                    padding: 20px;
-                    background: #1E1E1E;
-                    color: #FFFFFF;
+                    padding: 2rem;
                 }
-                h1 { color: #2e70e5; }
-                a {
-                    color: #2e70e5;
-                    text-decoration: none;
+                h1 {
+                    font-size: 2.5rem;
+                    margin-bottom: 0.5rem;
                 }
-                a:hover { text-decoration: underline; }
+                .subtitle {
+                    font-size: 1.2rem;
+                    opacity: 0.9;
+                }
                 .nav {
-                    background: #252526;
-                    padding: 20px;
+                    background: #F8F9FA;
+                    padding: 2rem;
                     border-radius: 8px;
-                    margin: 20px 0;
+                    margin: 2rem 0;
+                }
+                .nav h2 {
+                    color: #2e70e5;
+                    margin-bottom: 1rem;
                 }
                 .nav ul {
                     list-style: none;
-                    padding: 0;
                 }
                 .nav li {
-                    margin: 10px 0;
+                    margin: 0.75rem 0;
+                }
+                .nav a {
+                    color: #2e70e5;
+                    text-decoration: none;
+                    font-size: 1.1rem;
+                    display: inline-block;
+                    padding: 0.5rem 0;
+                    transition: transform 0.2s;
+                }
+                .nav a:hover {
+                    transform: translateX(5px);
+                    text-decoration: underline;
+                }
+                .quick-links {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 1rem;
+                    margin: 2rem 0;
+                }
+                .link-card {
+                    background: #F8F9FA;
+                    padding: 1.5rem;
+                    border-radius: 8px;
+                    text-align: center;
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }
+                .link-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                }
+                .link-card a {
+                    color: #2e70e5;
+                    text-decoration: none;
+                    font-weight: 600;
+                }
+                .footer {
+                    text-align: center;
+                    padding: 2rem;
+                    color: #6C757D;
+                    border-top: 1px solid #DEE2E6;
+                    margin-top: 3rem;
                 }
             </style>
         </head>
         <body>
-            <h1>eSIM Manager Documentation</h1>
-            <p>Welcome to the eSIM Manager documentation for NexoraSIM enterprise eSIM management solution.</p>
-            
-            <div class="nav">
-                <h2>Documentation</h2>
-                <ul>
-                    <li><a href="installation.html">Installation Guide</a></li>
-                    <li><a href="system-requirements.html">System Requirements</a></li>
-                    <li><a href="quick-start.html">Quick Start Guide</a></li>
-                    <li><a href="troubleshooting.html">Troubleshooting</a></li>
-                    <li><a href="developer-guide.html">Developer Guide</a></li>
-                </ul>
+            <div class="header">
+                <h1>NexoraSIM eSIM Manager</h1>
+                <p class="subtitle">Enterprise eSIM Lifecycle Management Documentation</p>
             </div>
             
-            <h2>Quick Links</h2>
-            <ul>
-                <li><a href="https://github.com/nexorasim/esim-manager">GitHub Repository</a></li>
-                <li><a href="https://github.com/nexorasim/esim-manager/releases">Download Latest Release</a></li>
-                <li><a href="https://github.com/nexorasim/esim-manager/issues">Report Issues</a></li>
-            </ul>
+            <div class="container">
+                <div class="nav">
+                    <h2>Documentation</h2>
+                    <ul>
+                        <li><a href="installation.html">Installation Guide</a> - Get started with installation</li>
+                        <li><a href="system-requirements.html">System Requirements</a> - Check compatibility</li>
+                        <li><a href="quick-start.html">Quick Start Guide</a> - Begin using the application</li>
+                        <li><a href="troubleshooting.html">Troubleshooting</a> - Resolve common issues</li>
+                        <li><a href="developer-guide.html">Developer Guide</a> - Contribute to the project</li>
+                    </ul>
+                </div>
+                
+                <h2>Quick Links</h2>
+                <div class="quick-links">
+                    <div class="link-card">
+                        <a href="https://github.com/nexorasim/esim-manager">GitHub Repository</a>
+                    </div>
+                    <div class="link-card">
+                        <a href="https://github.com/nexorasim/esim-manager/releases">Download Latest Release</a>
+                    </div>
+                    <div class="link-card">
+                        <a href="https://github.com/nexorasim/esim-manager/issues">Report Issues</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>&copy; 2026 NexoraSIM. All rights reserved.</p>
+                <p>Enterprise eSIM Lifecycle Management Solution</p>
+            </div>
         </body>
         </html>
         EOF
@@ -92,64 +175,135 @@ jobs:
     - name: Convert markdown to HTML
       run: |
         for file in docs/*.md; do
-          filename=$(basename "$file" .md)
-          cat > "_site/${filename}.html" << EOF
+          if [ -f "$file" ]; then
+            filename=$(basename "$file" .md)
+            cat > "_site/${filename}.html" << 'HTMLEOF'
         <!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>${filename} - eSIM Manager</title>
+            <title>FILENAME_PLACEHOLDER - NexoraSIM eSIM Manager</title>
             <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
                     line-height: 1.6;
+                    background: #FFFFFF;
+                    color: #212529;
+                }
+                .header {
+                    background: #2e70e5;
+                    color: white;
+                    padding: 1rem 2rem;
+                }
+                .header a {
+                    color: white;
+                    text-decoration: none;
+                }
+                .header a:hover {
+                    text-decoration: underline;
+                }
+                .container {
                     max-width: 1200px;
                     margin: 0 auto;
-                    padding: 20px;
-                    background: #1E1E1E;
-                    color: #FFFFFF;
+                    padding: 2rem;
                 }
-                h1, h2, h3 { color: #2e70e5; }
-                a { color: #2e70e5; text-decoration: none; }
-                a:hover { text-decoration: underline; }
+                h1, h2, h3, h4, h5, h6 {
+                    color: #2e70e5;
+                    margin-top: 1.5rem;
+                    margin-bottom: 0.75rem;
+                }
+                h1 { font-size: 2.5rem; }
+                h2 { font-size: 2rem; }
+                h3 { font-size: 1.5rem; }
+                a {
+                    color: #2e70e5;
+                    text-decoration: none;
+                }
+                a:hover {
+                    text-decoration: underline;
+                }
                 code {
-                    background: #252526;
+                    background: #F8F9FA;
                     padding: 2px 6px;
                     border-radius: 3px;
                     font-family: 'Courier New', monospace;
+                    color: #E83E8C;
                 }
                 pre {
-                    background: #252526;
-                    padding: 15px;
+                    background: #F8F9FA;
+                    padding: 1rem;
                     border-radius: 5px;
                     overflow-x: auto;
+                    margin: 1rem 0;
+                    border-left: 4px solid #2e70e5;
                 }
                 pre code {
                     background: none;
                     padding: 0;
+                    color: #212529;
+                }
+                ul, ol {
+                    margin-left: 2rem;
+                    margin-bottom: 1rem;
+                }
+                li {
+                    margin: 0.5rem 0;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 1rem 0;
+                }
+                th, td {
+                    border: 1px solid #DEE2E6;
+                    padding: 0.75rem;
+                    text-align: left;
+                }
+                th {
+                    background: #F8F9FA;
+                    font-weight: 600;
+                }
+                blockquote {
+                    border-left: 4px solid #2e70e5;
+                    padding-left: 1rem;
+                    margin: 1rem 0;
+                    color: #6C757D;
                 }
             </style>
         </head>
         <body>
-            <a href="index.html">← Back to Documentation Home</a>
-            <div id="content"></div>
+            <div class="header">
+                <a href="index.html">← Back to Documentation Home</a>
+            </div>
+            <div class="container" id="content"></div>
             <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
             <script>
-                fetch('${file}')
+                fetch('FILENAME_PLACEHOLDER.md')
                     .then(response => response.text())
                     .then(text => {
                         document.getElementById('content').innerHTML = marked.parse(text);
+                    })
+                    .catch(error => {
+                        document.getElementById('content').innerHTML = '<h1>Error loading documentation</h1><p>Please check back later.</p>';
                     });
             </script>
         </body>
         </html>
-        EOF
+        HTMLEOF
+            sed -i "s/FILENAME_PLACEHOLDER/${filename}/g" "_site/${filename}.html"
+          fi
         done
-        cp -r docs/* _site/
+        cp -r docs/* _site/ 2>/dev/null || true
         
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       
     - name: Deploy to GitHub Pages
+      id: deployment
       uses: actions/deploy-pages@v4

@@ -40,7 +40,8 @@ export default function Register() {
       toast.success('Account created successfully!')
       router.push('/dashboard')
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Registration failed')
+      console.error('Registration error:', error)
+      toast.error(error.message || 'Registration failed')
     } finally {
       setLoading(false)
     }

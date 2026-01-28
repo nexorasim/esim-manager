@@ -5,6 +5,7 @@ import { AuthService } from '../services/AuthService'
 import { AuditService } from '../services/AuditService'
 import { validateLogin, validateRegister } from '../middleware/validation'
 import { authenticateToken, requireRole, AuthenticatedRequest } from '../middleware/auth'
+import { env } from '../config/env'
 
 const router = Router()
 const authService = new AuthService()
@@ -37,10 +38,11 @@ router.post('/register', validateRegister, async (req, res, next) => {
       role: 'viewer' // Default role
     })
     
+    const userId = (user as any)._id || (user as any).id
     const token = jwt.sign(
-      { id: (user as any)._id || (user as any).id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '7d' }
+      { email: user.email, role: user.role },
+      env.jwt.secret,
+      { expiresIn: env.jwt.expiresIn, subject: String(userId), issuer: env.jwt.issuer, audience: env.jwt.audience }
     )
     
     await auditService.log({
@@ -117,10 +119,11 @@ router.post('/login', validateLogin, async (req, res, next) => {
     
     await authService.recordSuccessfulLogin((user as any)._id || (user as any).id)
     
+    const userId = (user as any)._id || (user as any).id
     const token = jwt.sign(
-      { id: (user as any)._id || (user as any).id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '7d' }
+      { email: user.email, role: user.role },
+      env.jwt.secret,
+      { expiresIn: env.jwt.expiresIn, subject: String(userId), issuer: env.jwt.issuer, audience: env.jwt.audience }
     )
     
     await auditService.log({
@@ -213,7 +216,7 @@ router.post('/refresh', async (req, res, next) => {
       return res.status(401).json({ error: 'Token required' })
     }
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
+    const decoded = jwt.verify(token, env.jwt.secret, { algorithms: ['HS256'], issuer: env.jwt.issuer, audience: env.jwt.audience }) as any
     const user = await authService.getUserById(decoded.id)
     
     if (!user) {
@@ -221,9 +224,9 @@ router.post('/refresh', async (req, res, next) => {
     }
     
     const newToken = jwt.sign(
-      { id: (user as any)._id || (user as any).id, email: user.email, role: user.role },
-      process.env.JWT_SECRET || 'fallback-secret',
-      { expiresIn: '7d' }
+      { email: user.email, role: user.role },
+      env.jwt.secret,
+      { expiresIn: env.jwt.expiresIn, subject: String((user as any)._id || (user as any).id), issuer: env.jwt.issuer, audience: env.jwt.audience }
     )
     
     res.json({ token: newToken })

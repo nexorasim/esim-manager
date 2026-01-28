@@ -215,7 +215,7 @@ export default function Dashboard() {
                           {getActionLabel(log.action)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {log.userEmail && `${log.userEmail} • `}
+                          {log.userEmail && `${log.userEmail} - `}
                           {format(new Date(log.timestamp), 'MMM d, HH:mm')}
                         </p>
                       </div>

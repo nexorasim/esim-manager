@@ -1,79 +1,96 @@
-import api from './api'
+import { FirebaseService } from '../lib/firebase-service'
+import { FirestoreProfile, ProfileStatus, ProfileClass } from '../lib/firestore-types'
+import { auth } from '../lib/firebase-config'
 
-export interface ESimProfile {
-  _id: string
+export interface CreateProfileData {
   iccid: string
   name: string
-  provider: string
-  status: 'active' | 'inactive' | 'pending' | 'deleted'
-  profileClass: 'operational' | 'test' | 'provisioning'
-  deviceId?: string
-  activatedDate?: string
-  deactivatedDate?: string
+  provider?: string
+  profileClass?: ProfileClass
   customNotes?: string
-  createdAt: string
-  updatedAt: string
+  metadata?: Record<string, any>
 }
 
-export interface ProfileStats {
-  total: number
-  active: number
-  inactive: number
-  pending: number
+export interface UpdateProfileData {
+  name?: string
+  status?: ProfileStatus
+  deviceId?: string
+  customNotes?: string
+  metadata?: Record<string, any>
 }
 
-export interface UniversalLink {
-  url: string
-  qrCode: string
-  appleLink: string
-  androidLink: string
-}
-
-export const profileService = {
-  async getProfiles(): Promise<ESimProfile[]> {
-    const response = await api.get('/api/profiles')
-    return response.data
-  },
-
-  async getProfile(iccid: string): Promise<ESimProfile> {
-    const response = await api.get(`/api/profiles/${iccid}`)
-    return response.data
-  },
-
-  async getStats(): Promise<ProfileStats> {
-    const response = await api.get('/api/profiles/stats')
-    return response.data
-  },
-
-  async provisionProfile(activationCode: string, name?: string): Promise<ESimProfile> {
-    const response = await api.post('/api/profiles/provision', { activationCode, name })
-    return response.data
-  },
-
-  async activateProfile(iccid: string): Promise<boolean> {
-    const response = await api.post(`/api/profiles/${iccid}/activate`)
-    return response.data.success
-  },
-
-  async deactivateProfile(iccid: string): Promise<boolean> {
-    const response = await api.post(`/api/profiles/${iccid}/deactivate`)
-    return response.data.success
-  },
-
-  async removeProfile(iccid: string): Promise<boolean> {
-    const response = await api.delete(`/api/profiles/${iccid}`)
-    return response.data.success
-  },
-
-  async assignToDevice(iccid: string, deviceId: string): Promise<boolean> {
-    const response = await api.post(`/api/profiles/${iccid}/assign`, { deviceId })
-    return response.data.success
-  },
-
-  async getUniversalLink(iccid: string): Promise<UniversalLink> {
-    const response = await api.get(`/api/profiles/${iccid}/universal-link`)
-    return response.data
+export class ProfileService {
+  static async createProfile(data: CreateProfileData): Promise<string> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    
+    const profileData = {
+      ...data,
+      provider: data.provider || 'NexoraSIM',
+      profileClass: data.profileClass || 'operational' as ProfileClass,
+      status: 'pending' as ProfileStatus,
+      userId: auth.currentUser.uid
+    }
+    
+    const profileId = await FirebaseService.createProfile(profileData)
+    
+    // Log profile creation
+    await FirebaseService.createAuditLog({
+      action: 'profile.create',
+      severity: 'info',
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email!,
+      resourceType: 'profile',
+      resourceId: profileId,
+      details: { iccid: data.iccid, name: data.name },
+      success: true
+    })
+    
+    return profileId
+  }
+  
+  static async getUserProfiles(): Promise<FirestoreProfile[]> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    return FirebaseService.getUserProfiles(auth.currentUser.uid)
+  }
+  
+  static async updateProfile(profileId: string, updates: UpdateProfileData): Promise<void> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    
+    await FirebaseService.updateProfile(profileId, updates)
+    
+    // Log profile update
+    await FirebaseService.createAuditLog({
+      action: updates.status === 'active' ? 'profile.activate' : 
+              updates.status === 'inactive' ? 'profile.deactivate' : 'profile.update',
+      severity: 'info',
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email!,
+      resourceType: 'profile',
+      resourceId: profileId,
+      details: updates,
+      success: true
+    })
+  }
+  
+  static async deleteProfile(profileId: string): Promise<void> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    
+    await FirebaseService.deleteProfile(profileId)
+    
+    // Log profile deletion
+    await FirebaseService.createAuditLog({
+      action: 'profile.delete',
+      severity: 'info',
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email!,
+      resourceType: 'profile',
+      resourceId: profileId,
+      success: true
+    })
+  }
+  
+  static subscribeToProfiles(callback: (profiles: FirestoreProfile[]) => void) {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    return FirebaseService.subscribeToUserProfiles(auth.currentUser.uid, callback)
   }
 }
-
-export default profileService

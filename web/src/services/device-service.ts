@@ -1,65 +1,95 @@
-import api from './api'
+import { FirebaseService } from '../lib/firebase-service'
+import { FirestoreDevice, ConnectionType, DeviceStatus } from '../lib/firestore-types'
+import { auth } from '../lib/firebase-config'
 
-export interface Device {
-  _id: string
+export interface CreateDeviceData {
   name: string
   eid: string
-  connectionType: 'wlan' | 'bluetooth' | 'usb'
-  status: 'online' | 'offline' | 'error'
+  connectionType: ConnectionType
   ipAddress?: string
   macAddress?: string
-  lastSeen?: string
-  createdAt: string
-  updatedAt: string
+  metadata?: Record<string, any>
 }
 
-export interface DeviceStats {
-  total: number
-  online: number
-  offline: number
+export interface UpdateDeviceData {
+  name?: string
+  status?: DeviceStatus
+  ipAddress?: string
+  macAddress?: string
+  lastSeen?: Date
+  metadata?: Record<string, any>
 }
 
-export const deviceService = {
-  async getDevices(): Promise<Device[]> {
-    const response = await api.get('/api/devices')
-    return response.data
-  },
-
-  async getDevice(eid: string): Promise<Device> {
-    const response = await api.get(`/api/devices/${eid}`)
-    return response.data
-  },
-
-  async getStats(): Promise<DeviceStats> {
-    const response = await api.get('/api/devices/stats')
-    return response.data
-  },
-
-  async addDevice(data: {
-    name: string
-    eid?: string
-    connectionType: 'wlan' | 'bluetooth' | 'usb'
-    ipAddress?: string
-    macAddress?: string
-  }): Promise<Device> {
-    const response = await api.post('/api/devices', data)
-    return response.data
-  },
-
-  async updateDevice(eid: string, data: Partial<Device>): Promise<Device> {
-    const response = await api.put(`/api/devices/${eid}`, data)
-    return response.data
-  },
-
-  async updateStatus(eid: string, status: 'online' | 'offline' | 'error'): Promise<boolean> {
-    const response = await api.post(`/api/devices/${eid}/status`, { status })
-    return response.data.success
-  },
-
-  async removeDevice(eid: string): Promise<boolean> {
-    const response = await api.delete(`/api/devices/${eid}`)
-    return response.data.success
+export class DeviceService {
+  static async createDevice(data: CreateDeviceData): Promise<string> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    
+    const deviceData = {
+      ...data,
+      status: 'offline' as DeviceStatus,
+      userId: auth.currentUser.uid
+    }
+    
+    const deviceId = await FirebaseService.createDevice(deviceData)
+    
+    // Log device creation
+    await FirebaseService.createAuditLog({
+      action: 'device.add',
+      severity: 'info',
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email!,
+      resourceType: 'device',
+      resourceId: deviceId,
+      details: { eid: data.eid, name: data.name, connectionType: data.connectionType },
+      success: true
+    })
+    
+    return deviceId
+  }
+  
+  static async getUserDevices(): Promise<FirestoreDevice[]> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    return FirebaseService.getUserDevices(auth.currentUser.uid)
+  }
+  
+  static async updateDevice(deviceId: string, updates: UpdateDeviceData): Promise<void> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    
+    await FirebaseService.updateDevice(deviceId, updates)
+    
+    // Log device update
+    await FirebaseService.createAuditLog({
+      action: updates.status === 'online' ? 'device.connect' : 
+              updates.status === 'offline' ? 'device.disconnect' : 'device.update',
+      severity: 'info',
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email!,
+      resourceType: 'device',
+      resourceId: deviceId,
+      details: updates,
+      success: true
+    })
+  }
+  
+  static async deleteDevice(deviceId: string): Promise<void> {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    
+    await FirebaseService.deleteDevice(deviceId)
+    
+    // Log device deletion
+    await FirebaseService.createAuditLog({
+      action: 'device.remove',
+      severity: 'info',
+      userId: auth.currentUser.uid,
+      userEmail: auth.currentUser.email!,
+      resourceType: 'device',
+      resourceId: deviceId,
+      success: true
+    })
+  }
+  
+  static subscribeToDevices(callback: (devices: FirestoreDevice[]) => void) {
+    if (!auth.currentUser) throw new Error('User not authenticated')
+    return FirebaseService.subscribeToUserDevices(auth.currentUser.uid, callback)
   }
 }
-
-export default deviceService

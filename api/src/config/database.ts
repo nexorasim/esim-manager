@@ -1,15 +1,21 @@
 import mongoose from 'mongoose'
+import { env } from './env'
 
 export const connectDatabase = async (): Promise<void> => {
-  const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017'
-  const dbName = process.env.DB_NAME || 'nexorasim'
-  
+  const mongoUrl = `${env.db.url.replace(/\/$/, '')}/${env.db.name}`
+
   try {
-    await mongoose.connect(`${mongoUrl}/${dbName}`)
+    await mongoose.connect(mongoUrl, {
+      serverSelectionTimeoutMS: 5000,
+      autoIndex: env.isDevelopment,
+    } as any)
     console.log('MongoDB connected successfully')
   } catch (error) {
     console.error('MongoDB connection error:', error)
-    // Continue without MongoDB - use in-memory storage as fallback
+    if (env.isProduction) {
+      throw error
+    }
+    // In development/test, allow app to continue for local testing.
   }
 }
 

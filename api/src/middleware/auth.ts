@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { UserRole } from '../models/User'
+import { env } from '../config/env'
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -19,15 +20,34 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any
-    req.user = {
-      id: decoded.id,
-      email: decoded.email,
-      role: decoded.role || 'viewer'
+    const decoded = jwt.verify(token, env.jwt.secret, {
+      algorithms: ['HS256'],
+      audience: env.jwt.audience,
+      issuer: env.jwt.issuer,
+    }) as JwtPayload
+
+    if (!decoded || typeof decoded !== 'object' || !decoded.sub) {
+      // Backward compatibility: some tokens may use `id`
+      const id = (decoded as any).id
+      if (!id) {
+        return res.status(401).json({ error: 'Invalid token payload' })
+      }
+      req.user = {
+        id,
+        email: (decoded as any).email,
+        role: ((decoded as any).role || 'viewer') as UserRole,
+      }
+    } else {
+      req.user = {
+        id: decoded.sub as string,
+        email: (decoded as any).email,
+        role: ((decoded as any).role || 'viewer') as UserRole,
+      }
     }
+
     next()
   } catch (error) {
-    return res.status(403).json({ error: 'Invalid or expired token' })
+    return res.status(401).json({ error: 'Invalid or expired token' })
   }
 }
 
@@ -40,9 +60,7 @@ export const requireRole = (...allowedRoles: UserRole[]) => {
 
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({ 
-        error: 'Insufficient permissions',
-        required: allowedRoles,
-        current: req.user.role
+        error: 'Insufficient permissions'
       })
     }
 

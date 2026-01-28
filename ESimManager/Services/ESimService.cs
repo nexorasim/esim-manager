@@ -178,6 +178,7 @@ public class ESimService : IESimService
         
         try
         {
+            await Task.CompletedTask; // Ensure async behavior
             var activationCode = $"LPA:1$sm-dp.nexorasim.com${iccid}";
             var universalLink = $"https://nexorasim.com/esim/activate?code={Uri.EscapeDataString(activationCode)}";
             
@@ -197,6 +198,7 @@ public class ESimService : IESimService
         
         try
         {
+            await Task.CompletedTask; // Ensure async behavior
             var activationCode = $"LPA:1$sm-dp.nexorasim.com${iccid}";
             _logger.Log(LogLevel.Info, "QR code data generated successfully");
             return activationCode;

@@ -6,5 +6,6 @@
   "/register": "pages/register.js",
   "/dashboard": "pages/dashboard.js",
   "/profiles": "pages/profiles.js",
-  "/devices": "pages/devices.js"
+  "/devices": "pages/devices.js",
+  "/": "pages/index.js"
 }
